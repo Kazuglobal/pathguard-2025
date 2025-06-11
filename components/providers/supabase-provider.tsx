@@ -8,8 +8,6 @@ import type { SupabaseClient } from '@supabase/supabase-js' // SupabaseClientは
 import type { Database } from '@/lib/database.types'
 
 // ↓↓↓ ここに追加 ↓↓↓
-console.log('⛳️ URL =', process.env.NEXT_PUBLIC_SUPABASE_URL)
-console.log('⛳️ KEY =', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 // ↑↑↑ ここに追加 ↑↑↑
 
 type SupabaseContext = {
