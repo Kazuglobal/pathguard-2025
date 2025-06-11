@@ -29,19 +29,24 @@ export class XRoadAPIError extends Error {
  * @returns APIレスポンス
  */
 export async function fetchFromXRoad(url: string) {
-  // URLオブジェクトを作成。元々のurlにはクエリパラメータが含まれている想定
-  // そのクエリパラメータをプロキシAPIのURLに付加する
-  const originalUrl = new URL(url); // url は `https://api.jartic-open-traffic.org/geoserver?service=WFS&...` のような形式
-  const proxyUrl = new URL(PROXY_API_BASE_URL, window.location.origin); // 第2引数で絶対URLを生成
+  let finalUrl: string;
 
-  originalUrl.searchParams.forEach((value, key) => {
-    proxyUrl.searchParams.append(key, value);
-  });
-  
-  // APIキーの処理はプロキシ側で行うか、あるいはここで元のURLに付与していたものを削除（今回はコメントアウト済み）
-  
-  // APIを呼び出す
-  const response = await fetch(proxyUrl.toString(), {
+  if (typeof window === 'undefined') {
+    // サーバーサイドではプロキシを経由せず直接外部APIを呼び出す
+    finalUrl = url;
+  } else {
+    // クライアントサイドではNext.jsのプロキシルートを利用する
+    const originalUrl = new URL(url);
+    const proxyUrl = new URL(PROXY_API_BASE_URL, window.location.origin);
+
+    originalUrl.searchParams.forEach((value, key) => {
+      proxyUrl.searchParams.append(key, value);
+    });
+
+    finalUrl = proxyUrl.toString();
+  }
+
+  const response = await fetch(finalUrl, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
